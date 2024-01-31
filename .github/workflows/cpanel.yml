@@ -12,11 +12,15 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '20.11.0'
-      
+
+    - name: Install Dependencies
+      run: npm install
+      working-directory: ./wndy
+    
     - name: 🔨 Build Project
-      run: |
-        npm install
-        npm run build
+      run: npm run build
+      working-directory: ./wndy
+  
     
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
