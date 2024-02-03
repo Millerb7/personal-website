@@ -12,7 +12,6 @@ function App() {
 
   return (
     <div className="App">
-        {/* Add the canvas element where the Spline object will be rendered */}
         <canvas id="canvas3d" style={{ width: '10%', height: '10%' }}></canvas>
     </div>
   );
