@@ -9,7 +9,7 @@ const blogPosts = [
   },
   {
     title: 'Post 2',
-    content: 'This is a thingy of the second post...',
+    content: 'This is a thingy of the seconwrd post...',
     id: 2,
   },
 ];
