@@ -32,7 +32,7 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <div> {/* Adjust this value based on your AppBar height */}
+      <div>
         <canvas id="canvas3d" style={{ width: '100%', height: '90vh' }}></canvas>
       </div>
     </div>
