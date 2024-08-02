@@ -1,26 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Container, Paper, Grid, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Paper,
+  Grid,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import axios from "axios";
 
 function BlogPost({ title, content, id }) {
   return (
-    <Paper style={{ padding: '20px' }}>
-      <Typography variant="h5" component="h3">{title}</Typography>
+    <Paper style={{ padding: "20px" }}>
+      <Typography variant="h5" component="h3">
+        {title}
+      </Typography>
       <Typography component="p">{content}</Typography>
-      <Button href={`/posts/${id}`} style={{ marginTop: '10px' }}>Read More</Button>
+      <Button href={`/posts/${id}`} style={{ marginTop: "10px" }}>
+        Read More
+      </Button>
     </Paper>
   );
 }
 
-function BlogPage() {
+export const Blog = () => {
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
-  const [newPost, setNewPost] = useState({ title: '', content: '' });
+  const [newPost, setNewPost] = useState({ title: "", content: "" });
 
   useEffect(() => {
-    axios.get('/posts')
-      .then(response => setPosts(response.data))
-      .catch(error => console.error('Error fetching posts:', error));
+    axios
+      .get("/posts")
+      .then((response) => setPosts(response.data))
+      .catch((error) => console.error("Error fetching posts:", error));
   }, []);
 
   const handleClickOpen = () => {
@@ -33,20 +51,21 @@ function BlogPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewPost(prevState => ({
+    setNewPost((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = () => {
-    axios.post('/posts', newPost)
-      .then(response => {
-        setPosts(prevPosts => [...prevPosts, response.data]);
+    axios
+      .post("/posts", newPost)
+      .then((response) => {
+        setPosts((prevPosts) => [...prevPosts, response.data]);
         setOpen(false);
-        setNewPost({ title: '', content: '' });
+        setNewPost({ title: "", content: "" });
       })
-      .catch(error => console.error('Error creating post:', error));
+      .catch((error) => console.error("Error creating post:", error));
   };
 
   return (
@@ -54,10 +73,12 @@ function BlogPage() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6">My Blog</Typography>
-          <Button color="inherit" onClick={handleClickOpen}>New Post</Button>
+          <Button color="inherit" onClick={handleClickOpen}>
+            New Post
+          </Button>
         </Toolbar>
       </AppBar>
-      <Container style={{ marginTop: '20px' }}>
+      <Container style={{ marginTop: "20px" }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             {posts.map((post) => (
@@ -102,6 +123,4 @@ function BlogPage() {
       </Dialog>
     </div>
   );
-}
-
-export default BlogPage;
+};
