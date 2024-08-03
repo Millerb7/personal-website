@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
+const api_url = 'http://localhost:8000';
+
 function BlogPost({ title, content, id }) {
   return (
     <Paper style={{ padding: "20px" }}>
@@ -36,7 +38,7 @@ export const Blog = () => {
 
   useEffect(() => {
     axios
-      .get("/posts")
+      .get(api_url + "/posts")
       .then((response) => setPosts(response.data))
       .catch((error) => console.error("Error fetching posts:", error));
   }, []);
@@ -58,8 +60,14 @@ export const Blog = () => {
   };
 
   const handleSubmit = () => {
+    const postData = {
+      ...newPost,
+      author_id: 1,
+      status: 'published'
+    };
+    console.log('Creating post with data:', postData);
     axios
-      .post("/posts", newPost)
+      .post(api_url + "/posts", postData)
       .then((response) => {
         setPosts((prevPosts) => [...prevPosts, response.data]);
         setOpen(false);
@@ -67,6 +75,7 @@ export const Blog = () => {
       })
       .catch((error) => console.error("Error creating post:", error));
   };
+  
 
   return (
     <div>
@@ -87,6 +96,8 @@ export const Blog = () => {
           </Grid>
         </Grid>
       </Container>
+
+
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>New Post</DialogTitle>
         <DialogContent>

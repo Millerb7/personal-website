@@ -1,17 +1,26 @@
 const express = require('express');
 const mysql = require('mysql');
-const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
+const port = 8000;
+const cors = require('cors');
 
-app.use(bodyParser.json()); // To parse JSON bodies
+app.use(express.json()); // To parse JSON bodies
+app.use(cors());
+
+
+// putty login
+// wndyhyax
+// LuffyHanzo77&*
 
 // Database connection details
 const dbConfig = {
-  host: 'server326.web-hosting.com',
+  //host: 'server326.web-hosting.com',
+  host: '127.0.0.1',
+  port: 5522,
   user: 'wndyhyax_wnd',
   password: 'Merber77*&',
-  database: 'wndyhyax_Portfolio'
+  database: 'wndyhyax_Portfolio',
+  connectTimeout: 10000 // Set timeout to 10 seconds
 };
 
 // Create a MySQL connection
@@ -51,15 +60,32 @@ app.get('/posts', (req, res) => {
 });
 
 app.post('/posts', (req, res) => {
+  console.log('posting');
   const { title, content, author_id, status } = req.body;
   const query = 'INSERT INTO posts (title, content, author_id, status) VALUES (?, ?, ?, ?)';
+  console.log(query);
   connection.query(query, [title, content, author_id, status], (err, results) => {
     if (err) {
       console.error('Error inserting into the database:', err.stack);
       res.status(500).send('Error inserting into the database');
       return;
     }
-    res.send('Post created successfully');
+
+    // Assuming `results.insertId` contains the id of the newly created post
+    const newPostId = results.insertId;
+
+    // Query the newly created post (or return relevant details if available)
+    connection.query('SELECT * FROM posts WHERE id = ?', [newPostId], (err, postResults) => {
+      if (err) {
+        console.error('Error retrieving the new post:', err.stack);
+        res.status(500).send('Error retrieving the new post');
+        return;
+      }
+      
+      // Assuming postResults[0] contains the new post data
+      const newPost = postResults[0];
+      res.json(newPost); // Send the new post data as JSON
+    });
   });
 });
 
