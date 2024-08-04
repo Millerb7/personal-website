@@ -1,26 +1,79 @@
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import { Box, AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import { Box, Button, IconButton } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import BrushIcon from "@mui/icons-material/Brush";
+import CreateIcon from "@mui/icons-material/Create";
+import CanvasComponent from "../Layouts/Canvas"; // Import the CanvasComponent
+import EraserComponent from "../Tools/Eraser";
 
 export const UserContext = createContext(null);
 
-const MainStyle = styled("div")(({ theme }) => ({
-  flexGrow: 1,
-  overflow: "auto",
-  minHeight: "100%",
-  paddingBottom: theme.spacing(10),
-  marginTop: theme.spacing(8), // Adjust margin to avoid overlap with AppBar
-  [theme.breakpoints.up("lg")]: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
+// Styled component for sticky note buttons
+const StickyNote = styled(Button)(({ theme }) => ({
+  background: "linear-gradient(145deg, #f7e7a5, #f5d689)",
+  borderRadius: "5px",
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  margin: theme.spacing(2),
+  padding: theme.spacing(2),
+  textTransform: "none",
+  fontWeight: "bold",
+  color: "#4a4a4a",
+  "&:hover": {
+    background: "linear-gradient(145deg, #f5d689, #f7e7a5)",
+    boxShadow: "0 6px 8px rgba(0, 0, 0, 0.15)",
+  },
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    width: "5px",
+    height: "5px",
+    background: "#c9a742",
+    borderRadius: "50%",
+    top: "5px",
+    right: "5px",
+  },
+}));
+
+const NavigationContainer = styled(Box)({
+  position: "absolute",
+  top: "10px",
+  left: "50%",
+  transform: "translateX(-50%)", // Center the navigation
+  display: "flex",
+  flexDirection: "row", // Align items in a row
+  zIndex: 5, // Ensure it's above the canvas
+});
+
+const BottomBar = styled(Box)(({ theme }) => ({
+  position: "fixed",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  background: "linear-gradient(145deg, #e1e1e1, #f0f0f0)",
+  borderTop: `1px solid #bfbfbf`,
+  boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.2)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(1),
+  zIndex: 3,
+  "&:before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "4px",
+    background: "linear-gradient(to right, #fff, #ccc, #fff)",
+    borderRadius: "2px",
   },
 }));
 
 export default function DashboardLayout() {
   const [user, setUser] = useState(undefined);
+  const [selectedTool, setSelectedTool] = useState("brush");
 
   useEffect(() => {
     // Fetch user details or other initial data if needed
@@ -28,18 +81,36 @@ export default function DashboardLayout() {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Button color="inherit" component={RouterLink} to="/">Home</Button>
-          <Button color="inherit" component={RouterLink} to="/blog">Blog</Button>
-          <Button color="inherit" component={RouterLink} to="/profile">Profile</Button>
-          <Button color="inherit" component={RouterLink} to="/resume">Resume</Button>
-          <Button color="inherit" component={RouterLink} to="/work">Work</Button>
-        </Toolbar>
-      </AppBar>
-      <MainStyle>
+      <NavigationContainer>
+        <StickyNote component={RouterLink} to="/">Home</StickyNote>
+        <StickyNote component={RouterLink} to="/blog">Blog</StickyNote>
+        <StickyNote component={RouterLink} to="/profile">Profile</StickyNote>
+        <StickyNote component={RouterLink} to="/resume">Resume</StickyNote>
+        <StickyNote component={RouterLink} to="/work">Work</StickyNote>
+      </NavigationContainer>
+      <CanvasComponent selectedTool={selectedTool} />
+      <Box component="main" sx={{ zIndex: 1, position: "relative" }}>
         <Outlet context={{ user }} />
-      </MainStyle>
+      </Box>
+      <BottomBar>
+        <IconButton 
+          color={selectedTool === "brush" ? "primary" : "default"}
+          onClick={() => setSelectedTool("brush")}
+        >
+          <BrushIcon />
+        </IconButton>
+        <IconButton 
+          color={selectedTool === "pen" ? "primary" : "default"}
+          onClick={() => setSelectedTool("pen")}
+        >
+          <CreateIcon />
+        </IconButton>
+        <EraserComponent
+          setSelectedTool={setSelectedTool}
+          selectedTool={selectedTool}
+        />
+        {/* Add more tool icons as needed */}
+      </BottomBar>
     </UserContext.Provider>
   );
 }
