@@ -1,11 +1,48 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Link as RouterLink } from "react-router-dom";
 import CanvasComponent from '../Layouts/Canvas';
+import { Box, Button } from "@mui/material";
 import DrawingBar from '../Tools/DrawingApp';
 
 export const UserContext = createContext(null);
+
+// Styled component for sticky note buttons
+const StickyNote = styled(Button)(({ theme }) => ({
+  background: "linear-gradient(145deg, #f7e7a5, #f5d689)",
+  borderRadius: "5px",
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  margin: theme.spacing(2),
+  padding: theme.spacing(2),
+  textTransform: "none",
+  fontWeight: "bold",
+  color: "#4a4a4a",
+  "&:hover": {
+    background: "linear-gradient(145deg, #f5d689, #f7e7a5)",
+    boxShadow: "0 6px 8px rgba(0, 0, 0, 0.15)",
+  },
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    width: "5px",
+    height: "5px",
+    background: "#c9a742",
+    borderRadius: "50%",
+    top: "5px",
+    right: "5px",
+  },
+}));
+
+const NavigationContainer = styled(Box)({
+  position: "absolute",
+  top: "10px",
+  left: "50%",
+  transform: "translateX(-50%)", // Center the navigation
+  display: "flex",
+  flexDirection: "row", // Align items in a row
+  zIndex: 5, // Ensure it's above the canvas
+});
 
 const BottomBar = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -44,7 +81,14 @@ export default function DashboardLayout() {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      <CanvasComponent selectedTool={selectedTool} brushSize={brushSize} color={color} />
+        <NavigationContainer>
+        <StickyNote component={RouterLink} to="/">Home</StickyNote>
+        <StickyNote component={RouterLink} to="/blog">Blog</StickyNote>
+        <StickyNote component={RouterLink} to="/profile">Profile</StickyNote>
+        <StickyNote component={RouterLink} to="/resume">Resume</StickyNote>
+        <StickyNote component={RouterLink} to="/work">Work</StickyNote>
+      </NavigationContainer>
+      <CanvasComponent selectedTool={selectedTool} brushSize={brushSize} color={color} />      
       <Box component="main" sx={{ zIndex: 1, position: 'relative' }}>
         <Outlet context={{ user }} />
       </Box>

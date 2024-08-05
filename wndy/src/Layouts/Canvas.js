@@ -16,7 +16,7 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
 
   useEffect(() => {
     if (context) {
-      context.lineWidth = selectedTool === 'eraser' ? 10 : brushSize;
+      context.lineWidth = brushSize; // Set the line width based on brushSize
       context.lineCap = 'round';
       context.strokeStyle = selectedTool === 'eraser' ? '#ffffff' : color;
     }
