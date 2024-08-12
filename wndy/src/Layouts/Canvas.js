@@ -16,6 +16,13 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
 
   useEffect(() => {
     if (context) {
+      if (selectedTool === 'pointer') {
+        canvasRef.current.style.cursor = 'default'; // Use default cursor for pointer
+      } else if (selectedTool === 'eraser') {
+          updateCursorForEraser(); // Use custom eraser cursor
+      } else {
+          updateCursor(); // Use the brush cursor
+      }
       context.lineWidth = brushSize; // Set the line width based on brushSize
       context.lineCap = 'round';
       context.strokeStyle = selectedTool === 'eraser' ? '#ffffff' : color;
@@ -42,6 +49,50 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
     context.closePath();
     setIsDrawing(false);
   };
+
+  const updateCursor = () => {
+    const cursorCanvas = document.createElement('canvas');
+    const ctx = cursorCanvas.getContext('2d');
+    const size = brushSize * 2;
+
+    cursorCanvas.width = size;
+    cursorCanvas.height = size;
+
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, brushSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    const dataURL = cursorCanvas.toDataURL();
+    canvasRef.current.style.cursor = `url(${dataURL}) ${brushSize / 2} ${brushSize / 2}, auto`;
+};
+
+const updateCursorForEraser = () => {
+  const cursorCanvas = document.createElement('canvas');
+  const ctx = cursorCanvas.getContext('2d');
+  const size = brushSize * 2;
+
+  cursorCanvas.width = size;
+  cursorCanvas.height = size;
+
+  // Draw a white circle in the middle of the canvas
+  ctx.beginPath();
+  ctx.arc(size / 2, size / 2, brushSize / 2, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+
+  // Draw a black outline around the circle
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2; // Set the outline thickness
+  ctx.stroke();
+
+  const dataURL = cursorCanvas.toDataURL();
+
+  // Apply the custom cursor with proper offsets for the eraser tool
+  canvasRef.current.style.cursor = `url(${dataURL}) ${size / 2} ${size / 2}, auto`;
+};
+
+
 
   return (
     <canvas
