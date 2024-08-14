@@ -1,54 +1,72 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Container, Box, Typography, Avatar, Divider, Grid } from "@mui/material";
+import styled from "@mui/material/styles/styled";
 
+// Styled component for the profile box to appear like it's pinned or written on a whiteboard
+const ProfileBox = styled(Box)(({ theme }) => ({
+  backgroundColor: "rgba(255, 255, 255, 0.85)", // Slightly transparent to blend with the whiteboard
+  padding: theme.spacing(3),
+  borderRadius: "8px",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Shadow to make it look like it's slightly lifted off the board
+  margin: "auto",
+  position: "relative",
+  maxWidth: "800px",
+}));
 
+// Marker-style font for the name and headings
+const MarkerTypography = styled(Typography)(({ theme }) => ({
+  fontFamily: '"Permanent Marker", cursive', // Marker-style font
+  color: "#333",
+}));
 
 export const Profile = () => {
-  useEffect(() => {
-
-  }, []);
-
   return (
-    <Container>
-      <Box mt={4} mb={4}>
+    <Container sx={{ position: "relative", mt: 4 }}>
+      <ProfileBox>
         <Avatar
-          alt="me fr"
+          alt="Miller Boyd"
           src="../../public/images/thorfinn.jpg"
-          sx={{ width: 100, height: 100, margin: "auto" }}
+          sx={{
+            width: 100,
+            height: 100,
+            margin: "auto",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+            border: "2px solid #000", // Simulate a border around the image
+          }}
         />
-        <Typography variant="h4" align="center" gutterBottom>
+        <MarkerTypography variant="h4" align="center" gutterBottom>
           Miller Boyd
-        </Typography>
-        <Typography variant="h6" align="center" gutterBottom>
-            Full Stack Developer | Machine Learning Enthusiast | Passionate Engineer
-        </Typography>
-        <Divider sx={{ marginY: 4 }} />
+        </MarkerTypography>
+        <MarkerTypography variant="h6" align="center" gutterBottom>
+          Full Stack Developer | Machine Learning Enthusiast | Passionate Engineer
+        </MarkerTypography>
+        <Divider sx={{ marginY: 4, borderColor: "#000" }} />
 
         <Box mb={4}>
-          <Typography variant="h5" gutterBottom>
+          <MarkerTypography variant="h5" gutterBottom>
             Who am I
-          </Typography>
+          </MarkerTypography>
           <Typography variant="body1">
-            Computer scientist who has been building full stack applications for years now. 
+            Computer scientist who has been building full stack applications for years now.
           </Typography>
         </Box>
 
         <Box mb={4}>
-          <Typography variant="h5" gutterBottom>
+          <MarkerTypography variant="h5" gutterBottom>
             Additional Information
-          </Typography>
+          </MarkerTypography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <Typography variant="h6">Hobbies</Typography>
+              <MarkerTypography variant="h6">Hobbies</MarkerTypography>
               <Typography variant="body1">List your hobbies here.</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography variant="h6">Contact Information</Typography>
+              <MarkerTypography variant="h6">Contact Information</MarkerTypography>
               <Typography variant="body1">Include your contact details, like email or social media links.</Typography>
             </Grid>
           </Grid>
         </Box>
-      </Box>
+      </ProfileBox>
     </Container>
   );
-}
+};

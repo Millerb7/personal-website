@@ -34,15 +34,25 @@ const StickyNote = styled(Button)(({ theme }) => ({
   },
 }));
 
-const NavigationContainer = styled(Box)({
-  position: "absolute",
-  top: "10px",
+// Change NavigationContainer to fixed or sticky
+const NavigationContainer = styled(Box)(({ theme }) => ({
+  position: "fixed", // or "sticky"
+  top: "0",
   left: "50%",
   transform: "translateX(-50%)", // Center the navigation
   display: "flex",
   flexDirection: "row", // Align items in a row
   zIndex: 5, // Ensure it's above the canvas
-});
+  background: "white", // Add background color to make it stand out
+  padding: theme.spacing(1),
+  width: "100%",
+}));
+
+// Main content area that will be in the background
+const ContentArea = styled(Box)(({ theme }) => ({
+  paddingTop: '60px', // Adjust paddingTop to account for the nav height
+  pointerEvents: 'none', // Disable pointer events so the canvas can capture all interactions
+}));
 
 const BottomBar = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -81,17 +91,25 @@ export default function DashboardLayout() {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-        <NavigationContainer>
+      <NavigationContainer>
         <StickyNote component={RouterLink} to="/">Home</StickyNote>
         <StickyNote component={RouterLink} to="/blog">Blog</StickyNote>
         <StickyNote component={RouterLink} to="/profile">Profile</StickyNote>
         <StickyNote component={RouterLink} to="/resume">Resume</StickyNote>
         <StickyNote component={RouterLink} to="/work">Work</StickyNote>
       </NavigationContainer>
-      <CanvasComponent selectedTool={selectedTool} brushSize={brushSize} color={color} />      
-      <Box component="main" sx={{ zIndex: 1, position: 'relative' }}>
+      
+      <ContentArea>
         <Outlet context={{ user }} />
-      </Box>
+      </ContentArea>
+      
+      <CanvasComponent 
+        selectedTool={selectedTool} 
+        brushSize={brushSize} 
+        color={color} 
+        sx={{ position: 'absolute', top: 0, left: 0, zIndex: 10 }} // Ensure the canvas is on top
+      />
+      
       <BottomBar>
         <DrawingBar
           selectedTool={selectedTool}
