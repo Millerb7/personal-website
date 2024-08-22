@@ -39,13 +39,13 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
   useEffect(() => {
     if (context) {
       if (selectedTool === 'pointer') {
-        canvasRef.current.style.cursor = 'default';
+        canvasRef.current.style.cursor = 'default'; // Use default cursor for pointer
       } else if (selectedTool === 'eraser') {
-        updateCursorForEraser();
+        updateCursorForEraser(); // Custom eraser cursor
       } else {
-        updateCursor();
+        updateCursor(); // Custom brush cursor
       }
-      context.lineWidth = brushSize;
+      context.lineWidth = brushSize; // Set the line width based on brushSize
       context.lineCap = 'round';
       context.strokeStyle = selectedTool === 'eraser' ? '#ffffff' : color;
     }
@@ -75,21 +75,25 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
 
     const currentStroke = localStack[localStack.length - 1];
     currentStroke.points.push({ x: offsetX, y: offsetY });
-    redrawCanvas(globalStack);
 
+    // Draw only the current segment
     context.lineTo(offsetX, offsetY);
     context.stroke();
   };
 
   const stopDrawing = () => {
-    if (selectedTool === 'pointer') return;
+    if (!isDrawing) return;
+
     setIsDrawing(false);
-    context.closePath();
+    context.closePath(); // Finish the current stroke
 
     const currentStroke = localStack[localStack.length - 1];
-    if (socket) {
+    if (socket && selectedTool !== 'eraser') {
       socket.emit('stroke', currentStroke); // Send stroke to other clients
     }
+
+    // Redraw the entire canvas with updated globalStack
+    redrawCanvas(globalStack);
   };
 
   const undoLastStroke = () => {
@@ -115,6 +119,7 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
   const redrawCanvas = (strokes) => {
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
+    // Redraw all strokes
     strokes.forEach((stroke) => {
       context.lineWidth = stroke.brushSize;
       context.lineCap = 'round';
@@ -158,11 +163,13 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
     cursorCanvas.width = size;
     cursorCanvas.height = size;
 
+    // Draw a white circle for eraser
     ctx.beginPath();
     ctx.arc(size / 2, size / 2, brushSize / 2, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
 
+    // Draw a black outline around the circle
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.stroke();

@@ -4,11 +4,12 @@ import PointerComponent from './Pointer';
 import EraserComponent from './Eraser';
 import BrushIcon from '@mui/icons-material/Brush';
 import CreateIcon from '@mui/icons-material/Create';
+import UndoIcon from '@mui/icons-material/Undo';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import { SketchPicker } from 'react-color';
 import PropTypes from 'prop-types';
 
-const DrawingBar = ({ selectedTool, setSelectedTool, brushSize, setBrushSize, color, setColor }) => {
+const DrawingBar = ({ selectedTool, setSelectedTool, undoLastStroke, brushSize, setBrushSize, color, setColor }) => {
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
 
   const handleColorPickerOpen = () => {
@@ -35,6 +36,13 @@ const DrawingBar = ({ selectedTool, setSelectedTool, brushSize, setBrushSize, co
         <CreateIcon />
       </IconButton>
       <EraserComponent setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
+      <IconButton 
+        color="default"
+        onClick={undoLastStroke}  // Trigger undo when clicked
+        title="Undo"
+      >
+        <UndoIcon />
+      </IconButton>
       <IconButton
         color="default"
         onClick={handleColorPickerOpen}
@@ -64,6 +72,7 @@ const DrawingBar = ({ selectedTool, setSelectedTool, brushSize, setBrushSize, co
 DrawingBar.propTypes = {
   selectedTool: PropTypes.string.isRequired,
   setSelectedTool: PropTypes.func.isRequired,
+  undoLastStroke: PropTypes.func.isRequired,
   brushSize: PropTypes.number.isRequired,
   setBrushSize: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,

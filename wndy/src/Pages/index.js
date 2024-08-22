@@ -34,16 +34,16 @@ const StickyNote = styled(Button)(({ theme }) => ({
   },
 }));
 
-// Change NavigationContainer to fixed or sticky
+// Navigation Container styled to be interactable
 const NavigationContainer = styled(Box)(({ theme }) => ({
-  position: "fixed", // or "sticky"
+  position: "fixed",
   top: "0",
   left: "50%",
-  transform: "translateX(-50%)", // Center the navigation
+  transform: "translateX(-50%)",
   display: "flex",
-  flexDirection: "row", // Align items in a row
-  zIndex: 5, // Ensure it's above the canvas
-  background: "white", // Add background color to make it stand out
+  flexDirection: "row",
+  zIndex: 20, // Ensure the navbar is above everything else
+  background: "white",
   padding: theme.spacing(1),
   width: "100%",
 }));
@@ -66,7 +66,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   padding: theme.spacing(1),
-  zIndex: 3,
+  zIndex: 11, // Make sure the toolbar is above the canvas
   '&:before': {
     content: '""',
     position: 'absolute',
@@ -84,6 +84,7 @@ export default function DashboardLayout() {
   const [selectedTool, setSelectedTool] = useState('brush');
   const [brushSize, setBrushSize] = useState(5); // Default brush size
   const [color, setColor] = useState('#000000'); // Default color
+  const [undoLastStroke, setUndoLastStroke] = useState(() => () => {});
 
   useEffect(() => {
     // Fetch user details or other initial data if needed
@@ -107,6 +108,7 @@ export default function DashboardLayout() {
         selectedTool={selectedTool} 
         brushSize={brushSize} 
         color={color} 
+        setUndoLastStroke={setUndoLastStroke} // Pass down the undo function setter
         sx={{ position: 'absolute', top: 0, left: 0, zIndex: 10 }} // Ensure the canvas is on top
       />
       
@@ -118,6 +120,7 @@ export default function DashboardLayout() {
           setBrushSize={setBrushSize}
           color={color}
           setColor={setColor}
+          undoLastStroke={undoLastStroke} // Pass the undo function to DrawingBar
         />
       </BottomBar>
     </UserContext.Provider>
