@@ -1,18 +1,50 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import io from 'socket.io-client';
+import DrawingBar from '../Tools/DrawingApp';
+import { Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const CanvasComponent = ({ selectedTool, brushSize, color }) => {
+// BottomBar styled component
+const BottomBar = styled(Box)(({ theme }) => ({
+  position: 'fixed',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  background: 'linear-gradient(145deg, #e1e1e1, #f0f0f0)',
+  borderTop: `1px solid #bfbfbf`,
+  boxShadow: '0 -2px 4px rgba(0, 0, 0, 0.2)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: theme.spacing(1),
+  zIndex: 11, // Make sure the toolbar is above the canvas
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '4px',
+    background: 'linear-gradient(to right, #fff, #ccc, #fff)',
+    borderRadius: '2px',
+  },
+}));
+
+const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSize, color, setColor }) => {
   const canvasRef = useRef(null);
   const [context, setContext] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [localStack, setLocalStack] = useState([]); // Local stack for undo/redo
   const [globalStack, setGlobalStack] = useState([]); // Global stack for all strokes
   const [socket, setSocket] = useState(null); // WebSocket connection
+  const [undoLastStroke, setUndoLastStroke] = useState(() => () => {}); // Undo function
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:3000'); // Replace with your WebSocket server URL
+    const socketInstance = io(process.env.REACT_APP_SOCKET_SERVER); // Use environment variable for WebSocket URL
     setSocket(socketInstance);
+
+    socketInstance.emit('init');
 
     // Handle incoming strokes from other users
     socketInstance.on('stroke', (stroke) => {
@@ -21,8 +53,8 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
     });
 
     // Handle undo events from other users
-    socketInstance.on('undo', (userId) => {
-      handleUndo(userId);
+    socketInstance.on('undo', () => {
+      handleUndo();
     });
 
     return () => socketInstance.disconnect();
@@ -88,7 +120,8 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
     context.closePath(); // Finish the current stroke
 
     const currentStroke = localStack[localStack.length - 1];
-    if (socket && selectedTool !== 'eraser') {
+    if (socket) {
+      console.log('sent stroke');
       socket.emit('stroke', currentStroke); // Send stroke to other clients
     }
 
@@ -96,21 +129,22 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
     redrawCanvas(globalStack);
   };
 
-  const undoLastStroke = () => {
+  const undoLastStrokeHandler = () => {
     if (localStack.length > 0) {
       const lastStroke = localStack.pop();
       setGlobalStack(globalStack.filter((stroke) => stroke !== lastStroke));
       redrawCanvas(globalStack);
-
+      console.log('undo');
+      
       if (socket) {
         socket.emit('undo'); // Notify other clients to undo the last stroke
       }
     }
   };
 
-  const handleUndo = (userId) => {
+  const handleUndo = () => {
     setGlobalStack((prevStack) => {
-      const updatedStack = prevStack.filter((stroke, index) => index !== prevStack.length - 1);
+      const updatedStack = prevStack.slice(0, -1);
       redrawCanvas(updatedStack);
       return updatedStack;
     });
@@ -163,13 +197,11 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
     cursorCanvas.width = size;
     cursorCanvas.height = size;
 
-    // Draw a white circle for eraser
     ctx.beginPath();
     ctx.arc(size / 2, size / 2, brushSize / 2, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
 
-    // Draw a black outline around the circle
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -179,23 +211,41 @@ const CanvasComponent = ({ selectedTool, brushSize, color }) => {
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      onMouseDown={startDrawing}
-      onMouseMove={draw}
-      onMouseUp={stopDrawing}
-      onMouseLeave={stopDrawing}
-      width={window.innerWidth}
-      height={window.innerHeight}
-      style={{ position: 'absolute', top: 0, left: 0 }}
-    />
+    <div style={{ position: 'relative', height: '100vh', width: '100vw' }}>
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+        width={window.innerWidth}
+        height={window.innerHeight - 80} // Adjust height to account for the BottomBar
+        style={{ position: 'absolute', top: 0, left: 0 }}
+      />
+
+      {/* Include the DrawingBar in the BottomBar */}
+      <BottomBar>
+        <DrawingBar
+          selectedTool={selectedTool}
+          setSelectedTool={setSelectedTool}
+          brushSize={brushSize}
+          setBrushSize={setBrushSize}
+          color={color}
+          setColor={setColor}
+          undoLastStroke={undoLastStrokeHandler} // Pass the undo function
+        />
+      </BottomBar>
+    </div>
   );
 };
 
 CanvasComponent.propTypes = {
   selectedTool: PropTypes.string.isRequired,
+  setSelectedTool: PropTypes.func.isRequired,
   brushSize: PropTypes.number.isRequired,
+  setBrushSize: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
+  setColor: PropTypes.func.isRequired,
 };
 
 export default CanvasComponent;

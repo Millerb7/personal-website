@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const connection = require('../db/connection');
+const connection = require('../connection');
 
 // Get all categories
 router.get('/categories', (req, res) => {
