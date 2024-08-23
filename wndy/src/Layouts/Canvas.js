@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import io from 'socket.io-client';
-import DrawingBar from '../Tools/DrawingApp';
+import DrawingBar from '../Tools/DrawingBar'; // Import your DrawingBar
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -18,7 +18,7 @@ const BottomBar = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   padding: theme.spacing(1),
-  zIndex: 11, // Make sure the toolbar is above the canvas
+  zIndex: 11, // Ensure it's above the canvas but not covering the canvas
   '&:before': {
     content: '""',
     position: 'absolute',
@@ -38,28 +38,52 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
   const [localStack, setLocalStack] = useState([]); // Local stack for undo/redo
   const [globalStack, setGlobalStack] = useState([]); // Global stack for all strokes
   const [socket, setSocket] = useState(null); // WebSocket connection
-  const [undoLastStroke, setUndoLastStroke] = useState(() => () => {}); // Undo function
 
   useEffect(() => {
-    const socketInstance = io(process.env.REACT_APP_SOCKET_SERVER); // Use environment variable for WebSocket URL
+    const socketInstance = io('http://localhost:8000'); // Fallback for testing
     setSocket(socketInstance);
 
-    socketInstance.emit('init');
+    console.log('Attempting to connect to WebSocket server...');
 
-    // Handle incoming strokes from other users
-    socketInstance.on('stroke', (stroke) => {
-      setGlobalStack((prevStack) => [...prevStack, stroke]);
-      redrawCanvas([...globalStack, stroke]);
+    socketInstance.on('connect', () => {
+      console.log('Connected to WebSocket server');
     });
 
-    // Handle undo events from other users
+    // Listen for 'init' event and update the canvas with the current whiteboard state
+    socketInstance.on('init', (strokes) => {
+      console.log('Received init event with strokes:', strokes);
+      setGlobalStack(strokes);
+      redrawCanvas(strokes); // Redraw the canvas with the received strokes
+    });
+
+    // Listen for new strokes from other users
+    socketInstance.on('stroke', (stroke) => {
+      console.log('Received stroke from server:', stroke);
+      setGlobalStack((prevStack) => {
+        const updatedStack = [...prevStack, stroke];
+        redrawCanvas(updatedStack); // Redraw the entire canvas with all strokes
+        return updatedStack;
+      });
+    });
+
+    // Listen for undo events from other users
     socketInstance.on('undo', () => {
+      console.log('Undo received from server');
       handleUndo();
     });
 
-    return () => socketInstance.disconnect();
-  }, []);
+    // Error handling for WebSocket connection
+    socketInstance.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+    });
 
+    return () => {
+      socketInstance.disconnect();
+      console.log('Disconnected from WebSocket server');
+    };
+  }, [context]); // Ensure that socket events are tied to context updates
+
+  // Set up the canvas when the component mounts
   useEffect(() => {
     const canvas = canvasRef.current;
     canvas.width = canvas.clientWidth;
@@ -68,6 +92,7 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
     setContext(ctx);
   }, []);
 
+  // Update the context whenever brush size, tool, or color changes
   useEffect(() => {
     if (context) {
       if (selectedTool === 'pointer') {
@@ -83,8 +108,9 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
     }
   }, [context, selectedTool, brushSize, color]);
 
+  // Start drawing on the canvas
   const startDrawing = ({ nativeEvent }) => {
-    if (selectedTool === 'pointer') return;
+    if (selectedTool === 'pointer' || !context) return; // Ensure context is available
     const { offsetX, offsetY } = nativeEvent;
     context.beginPath();
     context.moveTo(offsetX, offsetY);
@@ -101,8 +127,9 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
     setGlobalStack((prevStack) => [...prevStack, newStroke]);
   };
 
+  // Continue drawing as the mouse moves
   const draw = ({ nativeEvent }) => {
-    if (!isDrawing || selectedTool === 'pointer') return;
+    if (!isDrawing || selectedTool === 'pointer' || !context) return; // Ensure context is available
     const { offsetX, offsetY } = nativeEvent;
 
     const currentStroke = localStack[localStack.length - 1];
@@ -113,45 +140,48 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
     context.stroke();
   };
 
+  // Stop drawing when the mouse is released
   const stopDrawing = () => {
-    if (!isDrawing) return;
+    if (!isDrawing || !context) return;
 
     setIsDrawing(false);
     context.closePath(); // Finish the current stroke
 
     const currentStroke = localStack[localStack.length - 1];
-    if (socket) {
-      console.log('sent stroke');
+    if (socket && selectedTool !== 'eraser') {
       socket.emit('stroke', currentStroke); // Send stroke to other clients
     }
 
     // Redraw the entire canvas with updated globalStack
-    redrawCanvas(globalStack);
+    redrawCanvas(globalStack); // Ensure all strokes are redrawn
   };
 
+  // Undo the last stroke
   const undoLastStrokeHandler = () => {
-    if (localStack.length > 0) {
+    if (localStack.length > 0 && context) {
       const lastStroke = localStack.pop();
       setGlobalStack(globalStack.filter((stroke) => stroke !== lastStroke));
       redrawCanvas(globalStack);
-      console.log('undo');
-      
+
       if (socket) {
         socket.emit('undo'); // Notify other clients to undo the last stroke
       }
     }
   };
 
+  // Handle undoing strokes from other clients
   const handleUndo = () => {
     setGlobalStack((prevStack) => {
       const updatedStack = prevStack.slice(0, -1);
-      redrawCanvas(updatedStack);
+      redrawCanvas(updatedStack); // Redraw the canvas with updated stack
       return updatedStack;
     });
   };
 
+  // Redraw the canvas from the list of strokes
   const redrawCanvas = (strokes) => {
-    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    if (!context) return; // Ensure context is available before drawing
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); // Clear canvas before redraw
 
     // Redraw all strokes
     strokes.forEach((stroke) => {
@@ -172,6 +202,7 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
     });
   };
 
+  // Update the cursor for brush tool
   const updateCursor = () => {
     const cursorCanvas = document.createElement('canvas');
     const ctx = cursorCanvas.getContext('2d');
@@ -189,6 +220,7 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
     canvasRef.current.style.cursor = `url(${dataURL}) ${brushSize / 2} ${brushSize / 2}, auto`;
   };
 
+  // Update the cursor for the eraser tool
   const updateCursorForEraser = () => {
     const cursorCanvas = document.createElement('canvas');
     const ctx = cursorCanvas.getContext('2d');
@@ -211,7 +243,7 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
   };
 
   return (
-    <div style={{ position: 'relative', height: '100vh', width: '100vw' }}>
+    <div>
       <canvas
         ref={canvasRef}
         onMouseDown={startDrawing}
@@ -219,11 +251,9 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
         width={window.innerWidth}
-        height={window.innerHeight - 80} // Adjust height to account for the BottomBar
+        height={window.innerHeight}
         style={{ position: 'absolute', top: 0, left: 0 }}
       />
-
-      {/* Include the DrawingBar in the BottomBar */}
       <BottomBar>
         <DrawingBar
           selectedTool={selectedTool}
@@ -232,7 +262,7 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
           setBrushSize={setBrushSize}
           color={color}
           setColor={setColor}
-          undoLastStroke={undoLastStrokeHandler} // Pass the undo function
+          undoLastStroke={undoLastStrokeHandler} // Hook undo functionality
         />
       </BottomBar>
     </div>
