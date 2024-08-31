@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 let globalStrokes = [];
+let users = 0;
 
 // Helper function to log data
 const writeLog = (message) => {
@@ -16,7 +17,7 @@ const writeLog = (message) => {
 const saveWhiteboardData = (strokes) => {
   writeLog('Attempting to save whiteboard data');
 
-  axios.post('http://localhost:8000/whiteboard/save', { strokes }) // Fixed the endpoint
+  axios.post('http://localhost:8000/whiteboard/save', { strokes }) // Adjusted endpoint
     .then(() => {
       writeLog('Whiteboard data saved successfully');
     })
@@ -37,6 +38,8 @@ const setupWebSocket = (server) => {
 
   io.on('connection', (socket) => {
     writeLog('A user connected');
+    users++;
+    writeLog(`Current number of users: ${users}`);
 
     // Emit the current state of the whiteboard to the new client
     socket.emit('init', globalStrokes);
@@ -48,9 +51,6 @@ const setupWebSocket = (server) => {
       globalStrokes.push(stroke); // Add the stroke to the global strokes
       io.emit('stroke', stroke); // Broadcast the stroke to all clients
       writeLog(`Broadcast stroke: ${JSON.stringify(stroke)}`);
-
-      // Save whiteboard data after each stroke
-      saveWhiteboardData(globalStrokes);
     });
 
     // Handle undo events
@@ -59,16 +59,20 @@ const setupWebSocket = (server) => {
         const lastStroke = globalStrokes.pop(); // Remove the last stroke
         io.emit('undo'); // Notify all clients to undo the last stroke
         writeLog(`Undo last stroke: ${JSON.stringify(lastStroke)}`);
-
-        // Save the updated whiteboard data
-        saveWhiteboardData(globalStrokes);
       } else {
         writeLog('Undo attempted, but no strokes to undo');
       }
     });
 
     socket.on('disconnect', () => {
-      writeLog('A user disconnected');
+      users--;
+      writeLog(`A user disconnected. Current number of users: ${users}`);
+
+      // If no users are left, save the whiteboard data
+      if (users === 0) {
+        writeLog('No users left. Saving whiteboard data...');
+        saveWhiteboardData(globalStrokes);
+      }
     });
   });
 };

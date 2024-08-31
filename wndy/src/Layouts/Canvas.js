@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import io from 'socket.io-client';
-import DrawingBar from '../Tools/DrawingBar'; // Import your DrawingBar
+import DrawingBar from '../Tools/DrawingApp'; // Import your DrawingBar
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 

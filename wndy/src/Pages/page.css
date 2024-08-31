@@ -1,0 +1,23 @@
+/* page.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+ 
+.permanent-marker-regular h4 {
+  font-family: 'Permanent Marker', cursive !important;
+  font-weight: 500;
+  font-style: normal;
+  color: #7070ff;
+}
+
+.cabin-sketch-regular * {
+    font-family: "Cabin Sketch", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .cabin-sketch-bold {
+    font-family: "Cabin Sketch", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  

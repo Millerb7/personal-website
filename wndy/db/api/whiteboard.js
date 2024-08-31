@@ -5,7 +5,6 @@ const connection = require('../connection');
 // Save whiteboard data (strokes) to the database
 router.post('/save', (req, res) => {
   const { strokes } = req.body;
-  console.log('in save');
   
   // Save strokes in the database, update the single row for global whiteboard state
   const query = 'UPDATE global_whiteboard SET strokes = ?';
