@@ -5,18 +5,7 @@ import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
-
-const SectionBox = styled(Box)(({ theme }) => ({
-  border: '3px solid black',
-  borderRadius: '8px',
-  padding: theme.spacing(2),
-  margin: theme.spacing(2),
-  boxShadow: '4px 4px 0px 0px #000',
-  width: '100%',
-  height: '100vh',
-  maxHeight: '80vh',
-  overflow: 'auto',
-}));
+import { SectionBox } from '../SectionBox';
 
 export const LockheedMartinDetail = () => {
   const [numPages, setNumPages] = useState(null);
@@ -29,8 +18,8 @@ export const LockheedMartinDetail = () => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   return (
-    <SectionBox>
-      <Typography variant="h5" gutterBottom className="permanent-marker-regular">
+    <>
+      <Typography variant="h4" gutterBottom className="permanent-marker-regular">
         Lockheed Martin ML App – X-RAY Weld Flaw Detection App
       </Typography>
       <Typography variant="body1" gutterBottom>
@@ -57,6 +46,6 @@ export const LockheedMartinDetail = () => {
           />
         </Worker>
       </Box>
-    </SectionBox>
+    </>
   );
 };

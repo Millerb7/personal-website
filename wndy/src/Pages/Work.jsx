@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import { Box } from "@mui/material";
 import {
   LockheedMartinDetail,
+  DallasZooDetail,
   // Import more detailed components as needed
 } from "../Layouts/WorkSections";
 import { useOutletContext } from "react-router-dom";
 import './page.css';
+import { RandomizedSectionBox } from "../Layouts/SectionBox";
 
 const componentMap = {
   lockheedMartin: LockheedMartinDetail,
+  dallasZoo: DallasZooDetail,
   // Add more mappings as needed
 };
 
@@ -16,6 +19,7 @@ export const Work = () => {
   const { selectedTool } = useOutletContext(); 
   const [components, setComponents] = useState([
     { id: 1, component: <LockheedMartinDetail key={1} /> },
+    { id: 2, component: <DallasZooDetail key={2} /> },
     // Initialize with more detailed components if needed
   ]);
 
@@ -35,25 +39,37 @@ export const Work = () => {
   };
 
   return (
-    <Box sx={{ padding: "20px" }}>
       <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(500px, 1fr))",
-          gap: "20px",
-          justifyContent: "center",
-          marginBottom: "20px",
+          display: "flex",
+          flexWrap: "wrap", // Allows items to wrap to the next line if they don't fit
+          justifyContent: "space-around", // Distribute items with equal space around them
+          margin: "0 auto", // Center the flex container in its parent
+          marginBottom: "5%",
         }}
       >
         {components.map((comp) => (
-          <Box 
-          key={comp.id} 
-          onClick={() => handleRemoveComponent(comp.id)}
-          className="cabin-sketch-regular permanent-marker-regular">
+          <RandomizedSectionBox 
+            key={comp.id} 
+            onClick={() => handleRemoveComponent(comp.id)}
+            className="cabin-sketch-regular permanent-marker-regular"
+            sx={{
+              flex: "1 1 calc(50% - 40px)", // Flex-grow, flex-shrink, and basis; adjust as needed
+              maxWidth: {
+                xs: "100%", // 1 item per row on extra-small screens
+                sm: "calc(100% - 20px)", // 2 items per row on small screens
+                md: "calc(45% - 40px)", // 3 items per row on medium screens
+                lg: "calc(45% - 40px)", // 4 items per row on large screens
+              },
+              boxSizing: "border-box", // Include padding and border in element's width
+              marginBottom: "10%",
+            }}
+          >
             {comp.component}
-          </Box>
+          </RandomizedSectionBox>
         ))}
       </Box>
-    </Box>
   );
+  
+  
 };

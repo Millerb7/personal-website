@@ -5,32 +5,6 @@ import DrawingBar from '../Tools/DrawingApp'; // Import your DrawingBar
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-// BottomBar styled component
-const BottomBar = styled(Box)(({ theme }) => ({
-  position: 'fixed',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  background: 'linear-gradient(145deg, #e1e1e1, #f0f0f0)',
-  borderTop: `1px solid #bfbfbf`,
-  boxShadow: '0 -2px 4px rgba(0, 0, 0, 0.2)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: theme.spacing(1),
-  zIndex: 11, // Ensure it's above the canvas but not covering the canvas
-  '&:before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '4px',
-    background: 'linear-gradient(to right, #fff, #ccc, #fff)',
-    borderRadius: '2px',
-  },
-}));
-
 const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSize, color, setColor }) => {
   const canvasRef = useRef(null);
   const [context, setContext] = useState(null);
@@ -40,10 +14,10 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
   const [socket, setSocket] = useState(null); // WebSocket connection
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:8000'); // Fallback for testing
+    const socketInstance = io('http://localhost:8000');
     setSocket(socketInstance);
 
-    console.log('Attempting to connect to WebSocket server...');
+    console.log('Attempting to connect to WebSocket server...'+process.env.REACT_APP_SOCKET_SERVER);
 
     socketInstance.on('connect', () => {
       console.log('Connected to WebSocket server');
@@ -82,6 +56,11 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
       console.log('Disconnected from WebSocket server');
     };
   }, [context]); // Ensure that socket events are tied to context updates
+
+  useEffect(() => {
+    console.log('CanvasComponent props:', { selectedTool, brushSize, color });
+  }, [selectedTool, brushSize, color]);
+  
 
   // Set up the canvas when the component mounts
   useEffect(() => {
@@ -254,17 +233,6 @@ const CanvasComponent = ({ selectedTool, setSelectedTool, brushSize, setBrushSiz
         height={window.innerHeight}
         style={{ position: 'absolute', top: 0, left: 0 }}
       />
-      <BottomBar>
-        <DrawingBar
-          selectedTool={selectedTool}
-          setSelectedTool={setSelectedTool}
-          brushSize={brushSize}
-          setBrushSize={setBrushSize}
-          color={color}
-          setColor={setColor}
-          undoLastStroke={undoLastStrokeHandler} // Hook undo functionality
-        />
-      </BottomBar>
     </div>
   );
 };

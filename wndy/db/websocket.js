@@ -27,6 +27,8 @@ const saveWhiteboardData = (strokes) => {
 };
 
 const setupWebSocket = (server) => {
+  console.log('setting up socket');
+  
   const io = new Server(server, {
     cors: {
       origin: "*", // Adjust the origin if needed for security

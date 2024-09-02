@@ -7,7 +7,7 @@ export const Home = () => {
   const [color, setColor] = useState('#000000');
 
   return (
-    <div>
+    <div style={{ backgroundImage: `url('/images/brown-paper.png')`, backgroundSize: 'cover', minHeight: '100vh' }}>
       <CanvasComponent
         selectedTool={selectedTool}
         setSelectedTool={setSelectedTool}
