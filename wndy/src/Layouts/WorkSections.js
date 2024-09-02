@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
@@ -11,17 +12,21 @@ const SectionBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   margin: theme.spacing(2),
   boxShadow: '4px 4px 0px 0px #000',
-  width: '500px', // Wider for more detailed content
-  height: 'auto',
+  width: '100%',
+  height: '100vh',
+  maxHeight: '80vh',
+  overflow: 'auto',
 }));
 
-// Lockheed Martin ML App Detailed Component
 export const LockheedMartinDetail = () => {
   const [numPages, setNumPages] = useState(null);
 
   const onDocumentLoadSuccess = (pdf) => {
     setNumPages(pdf.numPages);
   };
+
+  // Initialize the default layout plugin
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   return (
     <SectionBox>
@@ -43,9 +48,13 @@ export const LockheedMartinDetail = () => {
       <Typography variant="body1" gutterBottom>
         Below is the detailed project report in PDF format:
       </Typography>
-      <Box sx={{ marginY: 2 }}>
-        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js">
-          <Viewer fileUrl="/docs/ExpoPoster.pdf" onDocumentLoad={onDocumentLoadSuccess} />
+      <Box sx={{ marginY: 2, height: '100%', maxHeight: '75vh', overflow: 'auto' }}>
+        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+          <Viewer
+            fileUrl="/docs/ExpoPoster.pdf"
+            plugins={[defaultLayoutPluginInstance]}
+            onDocumentLoad={onDocumentLoadSuccess}
+          />
         </Worker>
       </Box>
     </SectionBox>
