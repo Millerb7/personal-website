@@ -17,7 +17,7 @@ const writeLog = (message) => {
 const saveWhiteboardData = (strokes) => {
   writeLog('Attempting to save whiteboard data');
 
-  axios.post('http://localhost:8000/whiteboard/save', { strokes }) // Adjusted endpoint
+  axios.post(process.env.REACT_APP_SERVER ,'/whiteboard/save', { strokes }) // Adjusted endpoint
     .then(() => {
       writeLog('Whiteboard data saved successfully');
     })

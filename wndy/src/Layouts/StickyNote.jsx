@@ -15,6 +15,7 @@ const StyledStickyNote = styled(Button)(({ theme, backgroundImage }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  pointerEvents: 'auto',  // Re-enable pointer events for each nav item
 }));
 
 export const StickyNote = ({ children, ...props }) => {

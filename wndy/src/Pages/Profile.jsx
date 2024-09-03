@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Box, Typography, Avatar, Divider, Grid } from "@mui/material";
 import styled from "@mui/material/styles/styled";
+import ResumeDrawingBar from "../Tools/Bars/ResumeBar";
 
 // Styled component for the profile box to appear like it's pinned or written on a whiteboard
 const ProfileBox = styled(Box)(({ theme }) => ({
@@ -67,6 +68,7 @@ export const Profile = () => {
           </Grid>
         </Box>
       </ProfileBox>
+      <ResumeDrawingBar></ResumeDrawingBar>
     </Container>
   );
 };

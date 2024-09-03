@@ -11,8 +11,8 @@ export const HeaderSection = () => (
     </Typography>
     <Typography variant="body1" align="center">
       Dallas, Tx | (972) 989-3778 | <a href="mailto:mjboyd@smu.edu">mjboyd@smu.edu</a> | 
-      <a href="https://www.linkedin.com/in/miller-compsci/"> linkedin.com/in/miller-compsci/</a> | 
-      <a href="http://wndy.lol"> Dev Site: wndy.lol</a>
+      <a target="_blank" href="https://www.linkedin.com/in/miller-compsci/"> linkedin.com/in/miller-compsci/</a> | 
+      <a target="_blank" href="http://wndy.lol"> Dev Site: wndy.lol</a>
     </Typography>
   </>
 );
@@ -145,28 +145,18 @@ export const OrganizationsSection = () => (
 
 // DownloadResume Component
 export const DownloadResumeSection = () => (
-  <>
+  <a href="/docs/Miller_Boyd_Resume.pdf" download>
     <Typography variant="h4" gutterBottom>
       Download Resume
     </Typography>
-    <Typography variant="body1">
-      <a href="/docs/Miller_Boyd_Resume.pdf" download>
-        Click here to download my resume.
-      </a>
-    </Typography>
-  </>
+  </a>
 );
 
 // DownloadCoverLetter Component
 export const DownloadCoverLetterSection = () => (
-  <>
+  <a href="/docs/Miller_Boyd_Cover_Letter.pdf" download>
     <Typography variant="h4" gutterBottom>
       Download Cover Letter
     </Typography>
-    <Typography variant="body1">
-      <a href="/docs/Miller_Boyd_Cover_Letter.pdf" download>
-        Click here to download my cover letter.
-      </a>
-    </Typography>
-  </>
+    </a>
 );

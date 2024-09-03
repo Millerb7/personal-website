@@ -3,7 +3,6 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box } from '@mui/material';
-import DrawingBar from '../Tools/DrawingApp';
 import { StickyNote } from '../Layouts/StickyNote';
 
 export const UserContext = createContext(null);
@@ -20,22 +19,7 @@ const NavigationContainer = styled(Box)(({ theme }) => ({
   zIndex: 20,
   padding: theme.spacing(1),
   width: '100%',
-}));
-
-// Bottom Bar for drawing tools
-const BottomBar = styled(Box)(({ theme }) => ({
-  position: 'fixed',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  background: 'linear-gradient(145deg, #e1e1e1, #f0f0f0)',
-  borderTop: `1px solid #bfbfbf`,
-  boxShadow: '0 -2px 4px rgba(0, 0, 0, 0.2)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: theme.spacing(1),
-  zIndex: 11, // Ensure it's on top and clickable
+  pointerEvents: 'none',  // Disable pointer events so the canvas can be interacted with
 }));
 
 // Main content area for pages
@@ -56,7 +40,7 @@ export default function DashboardLayout() {
   };
 
   return (
-    <Box>
+    <Box style={{ backgroundImage: `url('/images/brown-paper.png')`, backgroundSize: 'cover', minHeight: '100vh' }}>
       <NavigationContainer>
         <StickyNote component={RouterLink} to="/">Home</StickyNote>
         <StickyNote component={RouterLink} to="/resume">Resume</StickyNote>
@@ -64,21 +48,8 @@ export default function DashboardLayout() {
       </NavigationContainer>
 
       <ContentArea>
-        <Outlet context={{ selectedTool, setSelectedTool, addElementToPage }} />
+        <Outlet context={{ selectedTool, setSelectedTool, brushSize, setBrushSize, color, setColor, addElementToPage }} />
       </ContentArea>
-
-      <BottomBar>
-        <DrawingBar
-          selectedTool={selectedTool}
-          setSelectedTool={setSelectedTool}
-          brushSize={brushSize}
-          setBrushSize={setBrushSize}
-          color={color}
-          setColor={setColor}
-          page={location.pathname.replace('/', '') || 'home'} // Pass the current page identifier
-          addElementToPage={addElementToPage} // Pass the function to add elements to the page
-        />
-      </BottomBar>
     </Box>
   );
 }

@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
-import CanvasComponent from '../Layouts/Canvas'; // Assuming the Canvas is in Layouts folder
+import React from 'react';
+import CanvasComponent from '../Layouts/Canvas'; 
+import { useOutletContext } from 'react-router-dom';
 
 export const Home = () => {
-  const [selectedTool, setSelectedTool] = useState('brush');
-  const [brushSize, setBrushSize] = useState(5);
-  const [color, setColor] = useState('#000000');
+  // Retrieve the context from Outlet
+  const {
+    selectedTool,
+    setSelectedTool,
+    brushSize,
+    setBrushSize,
+    color,
+    setColor,
+  } = useOutletContext();
+
+  console.log({ selectedTool, setSelectedTool, brushSize, setBrushSize, color, setColor });
 
   return (
-    <div style={{ backgroundImage: `url('/images/brown-paper.png')`, backgroundSize: 'cover', minHeight: '100vh' }}>
+    <div>
       <CanvasComponent
         selectedTool={selectedTool}
         setSelectedTool={setSelectedTool}

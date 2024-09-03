@@ -15,8 +15,9 @@ import {
   DownloadCoverLetterSection,
 } from "../Layouts/ResumeSections";
 import { useOutletContext } from "react-router-dom";
-import './page.css';
+import "./page.css";
 import { RandomizedSectionBox } from "../Layouts/SectionBox";
+import ResumeDrawingBar from "../Tools/Bars/ResumeBar";
 
 const componentMap = {
   header: HeaderSection,
@@ -34,10 +35,17 @@ const componentMap = {
 };
 
 export const Resume = () => {
-  const { selectedTool } = useOutletContext(); 
+  const {
+    selectedTool,
+    setSelectedTool,
+    brushSize,
+    setBrushSize,
+    color,
+    setColor,
+  } = useOutletContext();
   const [components, setComponents] = useState([
     { id: 1, component: <HeaderSection key={1} /> },
-    { id: 2, component: <DownloadResumeSection key={2} /> }, 
+    { id: 2, component: <DownloadResumeSection key={2} /> },
     { id: 3, component: <DownloadCoverLetterSection key={3} /> },
     { id: 4, component: <LanguagesToolsSection key={4} /> },
     { id: 5, component: <EducationSection key={5} /> },
@@ -55,14 +63,17 @@ export const Resume = () => {
     if (ComponentToAdd) {
       setComponents((prev) => [
         ...prev,
-        { id: prev.length + 1, component: <ComponentToAdd key={prev.length + 1} /> },
+        {
+          id: prev.length + 1,
+          component: <ComponentToAdd key={prev.length + 1} />,
+        },
       ]);
     }
   };
 
   const handleRemoveComponent = (id) => {
-    if(selectedTool === 'componentRemover')
-        setComponents((prev) => prev.filter((comp) => comp.id !== id));
+    if (selectedTool === "componentRemover")
+      setComponents((prev) => prev.filter((comp) => comp.id !== id));
   };
 
   return (
@@ -76,8 +87,8 @@ export const Resume = () => {
       }}
     >
       {components.map((comp) => (
-        <RandomizedSectionBox 
-          key={comp.id} 
+        <RandomizedSectionBox
+          key={comp.id}
           onClick={() => handleRemoveComponent(comp.id)}
           className="cabin-sketch-regular permanent-marker-regular"
           sx={{
@@ -94,8 +105,16 @@ export const Resume = () => {
           }}
         >
           {comp.component}
+          <ResumeDrawingBar
+            selectedTool={selectedTool}
+            setSelectedTool={setSelectedTool}
+            brushSize={brushSize}
+            setBrushSize={setBrushSize}
+            color={color}
+            setColor={setColor}
+          ></ResumeDrawingBar>
         </RandomizedSectionBox>
       ))}
     </Box>
-);
+  );
 };

@@ -8,6 +8,7 @@ import {
 import { useOutletContext } from "react-router-dom";
 import './page.css';
 import { RandomizedSectionBox } from "../Layouts/SectionBox";
+import ResumeDrawingBar from "../Tools/Bars/ResumeBar";
 
 const componentMap = {
   lockheedMartin: LockheedMartinDetail,
@@ -16,7 +17,14 @@ const componentMap = {
 };
 
 export const Work = () => {
-  const { selectedTool } = useOutletContext(); 
+  const {
+    selectedTool,
+    setSelectedTool,
+    brushSize,
+    setBrushSize,
+    color,
+    setColor,
+  } = useOutletContext();
   const [components, setComponents] = useState([
     { id: 1, component: <LockheedMartinDetail key={1} /> },
     { id: 2, component: <DallasZooDetail key={2} /> },
@@ -66,6 +74,14 @@ export const Work = () => {
             }}
           >
             {comp.component}
+            <ResumeDrawingBar
+            selectedTool={selectedTool}
+            setSelectedTool={setSelectedTool}
+            brushSize={brushSize}
+            setBrushSize={setBrushSize}
+            color={color}
+            setColor={setColor}
+          ></ResumeDrawingBar>
           </RandomizedSectionBox>
         ))}
       </Box>
