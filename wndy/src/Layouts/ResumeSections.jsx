@@ -145,7 +145,7 @@ export const OrganizationsSection = () => (
 
 // DownloadResume Component
 export const DownloadResumeSection = () => (
-  <a href="/docs/Miller_Boyd_Resume.pdf" download>
+  <a rel="noopener noreferrer" href="/docs/Miller_Boyd_Resume.pdf" download>
     <Typography variant="h4" gutterBottom>
       Download Resume
     </Typography>
@@ -154,7 +154,7 @@ export const DownloadResumeSection = () => (
 
 // DownloadCoverLetter Component
 export const DownloadCoverLetterSection = () => (
-  <a href="/docs/Miller_Boyd_Cover_Letter.pdf" download>
+  <a rel="noopener noreferrer" href="/docs/Miller_Boyd_Cover_Letter.pdf" download>
     <Typography variant="h4" gutterBottom>
       Download Cover Letter
     </Typography>
