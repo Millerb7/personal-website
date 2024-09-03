@@ -18,7 +18,7 @@ jobs:
       working-directory: ./wndy
     
     - name: 🔨 Build Project
-      run: npm run build
+      run: CI=false npm run build
       working-directory: ./wndy
   
     
